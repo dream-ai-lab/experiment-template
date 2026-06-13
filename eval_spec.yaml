@@ -1,0 +1,41 @@
+# Eval contract for: DistilBERT on SST-2
+# Copied from the paper-registry and pinned. Immutable once a run exists.
+spec_version: "1.0.0"
+paper_id: "distilbert-sst2"
+task: "sentiment_classification"
+
+metric_lib_version: "0.1.0"
+
+dataset:
+  hf_id: "stanfordnlp/sst2"
+  config: null
+  split: "validation"
+  version: "2.0.0"
+  revision: "8d51e7e4887a4caaa95b3fbebbf53c0490b58bbb"
+  text_field: "sentence"
+  label_field: "label"
+
+model:
+  hf_id: "distilbert-base-uncased-finetuned-sst-2-english"
+  revision: "714eb0fa89d2f80546fda750413ed43d93601a13"
+
+inference:
+  seed: 42
+  max_length: 256
+  batch_size: 32
+
+metrics:
+  primary: "accuracy"
+  secondary: ["f1"]
+
+baseline_scores:
+  paper_reported:
+    value: 0.913
+    metric_variant: "accuracy (GLUE dev, SST-2)"
+    source: "DistilBERT, Sanh et al. 2019, Table 1"
+  our_reproduce:
+    value: null
+    metric_variant: "accuracy (eval_lib 0.1.0)"
+
+reproduce_target:
+  accuracy: { min: 0.90, max: 0.92 }

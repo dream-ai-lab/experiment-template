@@ -1,0 +1,19 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Enforces the contract with the pinned standard — no heavy model download.
+jobs:
+  validate-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install the standard (pinned)
+        run: pip install "git+https://github.com/dream-ai-lab/eval-lib@v0.1.0"
+      - name: Validate eval_spec against the standard
+        run: python -c "from eval_lib import load_spec; s = load_spec('eval_spec.yaml'); print('valid:', s.paper_id, s.hash)"
