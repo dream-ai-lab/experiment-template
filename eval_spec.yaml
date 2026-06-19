@@ -27,6 +27,10 @@ inference:
 metrics:
   primary: "accuracy"
   secondary: ["f1"]
+  # Need a metric eval-lib doesn't ship yet? Declare it here and pass the
+  # callable to run_paper(extra_metrics=...) — no PR required. The run is then
+  # tagged eval_tier=experimental. See the README. e.g.:
+  # experimental: ["mcc"]
 
 baseline_scores:
   paper_reported:

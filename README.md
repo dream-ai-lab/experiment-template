@@ -16,6 +16,8 @@ replace it with your paper.
    ```bash
    curl -s https://huggingface.co/api/models/<org/model> | python -c "import sys,json;print(json.load(sys.stdin)['sha'])"
    ```
+   Need a metric `eval-lib` doesn't ship yet? Don't wait for a PR — declare it
+   experimental and run now (see *Experimental metrics* below).
 
 3. **Edit `model_fn`** in `reproduce.py` (experiment member) — map the model's
    output labels to the dataset's label ids; for non-classification tasks,
@@ -32,10 +34,39 @@ replace it with your paper.
 5. **Propose** (optional): add `proposal.py`, fork the baseline run — still no
    PR to any central repo.
 
+## Experimental metrics — a metric `eval-lib` doesn't have yet
+
+You do **not** need to PR a metric into `eval-lib` before you can experiment.
+Declare it in the spec and pass the callable at runtime:
+
+```yaml
+# eval_spec.yaml
+metrics:
+  primary: "mcc"
+  experimental: ["mcc"]     # not in eval-lib; supplied below
+```
+
+```python
+# reproduce.py
+def mcc(preds, refs):       # your metric, (preds, refs) -> float
+    from sklearn.metrics import matthews_corrcoef
+    return float(matthews_corrcoef(refs, preds))
+
+run_paper(SPEC, build_model_fn(spec), extra_metrics={"mcc": mcc})
+```
+
+The run is tagged `eval_tier=experimental` (vs `standard`) and records a
+fingerprint of your metric code, so it stays clearly separate from official
+baselines. **Promote** it once it stabilises: PR the function into `eval-lib`,
+bump the version, and drop it from `metrics.experimental` — the run then logs
+`eval_tier=standard` automatically. Requires `eval-lib >= 0.2.0`.
+
 ## What you never do
 
 - Copy or fork `eval-lib` — depend on a **pinned version** (`requirements.txt`).
-- Write your own metric — add it to `eval-lib` and bump its version.
+- Re-implement a *standard* metric — use it by name, or (for a new one) run it
+  experimental now and promote it into `eval-lib` later.
 - PR experiment code back to a central repo — this repo is yours.
 
-The only central PRs are: a new metric → `eval-lib`, a new spec → `paper-registry`.
+No central PR is needed to run an experimental metric. The only central PRs are:
+promoting a metric → `eval-lib`, a new canonical spec → `paper-registry`.
