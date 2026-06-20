@@ -1,6 +1,6 @@
 # The standard, pinned — installed as a dependency, never copied.
 --extra-index-url https://download.pytorch.org/whl/cpu
-eval-lib @ git+https://github.com/dream-ai-lab/eval-lib@v0.2.0
+eval-lib @ git+https://github.com/dream-ai-lab/eval-lib@v0.4.0    # pulls wandb transitively
 torch==2.12.0
 transformers==4.57.1
 # datasets is pulled in transitively by eval-lib.
