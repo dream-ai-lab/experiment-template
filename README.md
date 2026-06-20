@@ -4,6 +4,10 @@ GitHub **template repo** for reproducing a new paper under the eval standard.
 Ships a working DistilBERT-SST-2 example so it runs green immediately — you
 replace it with your paper.
 
+> **Working in Claude Code?** This repo ships the **`eval-workflow`** skill
+> (`.claude/skills/`). Just say what you want ("reproduce paper X", "log this run",
+> "add a metric") and it walks you through the whole flow end-to-end.
+
 ## When you want to experiment with a new paper
 
 1. Click **“Use this template” → Create a new repository**, named
@@ -23,16 +27,25 @@ replace it with your paper.
    output labels to the dataset's label ids; for non-classification tasks,
    replace the body. The contract is just `model_fn(texts) -> list[int]`.
 
-4. **Run:**
+4. **Point W&B at the team** (runs log to Weights & Biases):
    ```bash
-   pip install -r requirements.txt        # pulls eval-lib (pinned) + torch + transformers
+   wandb login                          # or set WANDB_API_KEY
+   export WANDB_ENTITY=dream-ai-lab     # the team
+   export WANDB_PROJECT=eval-lib        # optional; defaults to "eval-lib"
+   # export WANDB_MODE=offline          # run now without a network; `wandb sync` later
+   ```
+
+5. **Run:**
+   ```bash
+   pip install -r requirements.txt        # pulls eval-lib (pinned) + wandb + torch + transformers
    python reproduce.py
    ```
-   If `target_passed=True`, you reproduced it. Log to the shared server with
-   `MLFLOW_TRACKING_URI=http://<server>:5000`.
+   If `target_passed=True`, you reproduced it. The run lands in W&B under your
+   project, grouped by `paper_id`.
 
-5. **Propose** (optional): add `proposal.py`, fork the baseline run — still no
-   PR to any central repo.
+6. **Propose** (optional): add `proposal.py`, log with `role="proposal"` and a
+   `parent_run_id` to get `delta_<metric>` vs the baseline — still no PR to any
+   central repo.
 
 ## Experimental metrics — a metric `eval-lib` doesn't have yet
 
